@@ -14,6 +14,18 @@ clock = pygame.time.Clock()
 # Scale to monitor resolution
 screen_width, screen_height = screen.get_size()
 
+audio_files = {
+    "track1": "song1_clip.mp3",
+    "track2": "song2_clip.mp3",
+    "track3": "song3_clip.mp3"
+}
+
+good_answers = { # will be lowercase by default
+    "track1": ["will always", "love you", "whitney", "houston", "wit", "whit", "hue"],
+    "track2": ["perfect", "ed", "sheer", "sheeran", "shear"],
+    "track3": ["thousand", "1000", "years", "perri", "christina", "cristina", "perry", "parry", "perrier"]
+}
+
 # Load images
 title_screen = pygame.image.load('title_screen.png')
 begin_screen = pygame.image.load('begin_screen.png')
