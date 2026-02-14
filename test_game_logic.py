@@ -113,6 +113,7 @@ def show_image(image):
 
 #Update the score
 def check_score():
+    global score
     if pointPlayer1 == 0 and pointPlayer2 == 0:
         score = "00"
     elif pointPlayer1 == 1 and pointPlayer2 == 0:
@@ -147,7 +148,7 @@ def image_buzzed(image):
             pygame.display.flip()  # update screen
             clock.tick(60)  # limit FPS
             current_image = None
-            time.sleep(5)
+            time.sleep(3)
 
 
     if image == "p2song1":
@@ -157,11 +158,14 @@ def image_buzzed(image):
             pygame.display.flip()  # update screen
             clock.tick(60)  # limit FPS
             current_image = None
-            time.sleep(5)
+            time.sleep(3)
 
 
     if image == "track1_correct_10":
         current_image = track1_correct_10
+        screen.blit(current_image, (0, 0))  # draw image
+        pygame.display.flip()  # update screen
+        clock.tick(60)  # limit FPS 
         while current_image == track1_correct_10: 
             line = ser.readline().decode().strip()
             b1, b2 = map(int, line.split(",")) # convert both inputs to int
@@ -180,7 +184,31 @@ def image_buzzed(image):
 
     if image == "track1_correct_01":
         current_image = track1_correct_01
+        screen.blit(current_image, (0, 0))  # draw image
+        pygame.display.flip()  # update screen
+        clock.tick(60)  # limit FPS 
         while current_image == track1_correct_01: 
+            line = ser.readline().decode().strip()
+            b1, b2 = map(int, line.split(",")) # convert both inputs to int
+
+            if b1 == 0 or b2 == 0: # a buzzer was pressed
+                if score == "00":
+                    current_image = track2_wait_00
+                elif score == "10":
+                    current_image = track2_wait_10
+                elif score == "01":
+                    current_image = track2_wait_01
+            
+            screen.blit(current_image, (0, 0))  # draw image
+            pygame.display.flip()  # update screen
+            clock.tick(60)  # limit FPS
+    
+    if image == "track1_incorrect_00":
+        current_image = track1_incorrect_00
+        screen.blit(current_image, (0, 0))  # draw image
+        pygame.display.flip()  # update screen
+        clock.tick(60)  # limit FPS 
+        while current_image == track1_incorrect_00: 
             line = ser.readline().decode().strip()
             b1, b2 = map(int, line.split(",")) # convert both inputs to int
 
@@ -204,7 +232,7 @@ def image_buzzed(image):
             pygame.display.flip()  # update screen
             clock.tick(60)  # limit FPS
             current_image = None
-            time.sleep(5)
+            time.sleep(3)
 
     if image == "p2song2":
         current_image = globals()[f"track2_b2press_{score}"]
@@ -213,11 +241,13 @@ def image_buzzed(image):
             pygame.display.flip()  # update screen
             clock.tick(60)  # limit FPS
             current_image = None
-            time.sleep(5)
-
-
+            time.sleep(3)
 
     if image == f"track2_correct_{score}":
+        current_image = globals()[f"track2_correct_{score}"]
+        screen.blit(current_image, (0, 0))  # draw image
+        pygame.display.flip()  # update screen
+        clock.tick(60)  # limit FPS
         while current_image == globals()[f"track2_correct_{score}"]: 
             line = ser.readline().decode().strip()
             b1, b2 = map(int, line.split(",")) # convert both inputs to int
@@ -230,6 +260,10 @@ def image_buzzed(image):
             clock.tick(60)  # limit FPS
     
     if image == f"track2_incorrect_{score}":
+        current_image = globals()[f"track2_incorrect_{score}"]
+        screen.blit(current_image, (0, 0))  # draw image
+        pygame.display.flip()  # update screen
+        clock.tick(60)  # limit FPS
         while current_image == globals()[f"track2_incorrect_{score}"]: 
             line = ser.readline().decode().strip()
             b1, b2 = map(int, line.split(",")) # convert both inputs to int
@@ -303,7 +337,7 @@ while end_game == False:
                 check_score()
                 image_buzzed("track1_incorrect_00")
 
-
+    #WAIT FOR TRACK 2 TRANSITION
     #CHECK TRACK 2
     while track2_is_done == False:
         if buzzed() == player1:
