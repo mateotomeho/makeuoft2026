@@ -14,31 +14,44 @@ clock = pygame.time.Clock()
 # Load images
 title_screen = pygame.image.load('title_screen.png')
 begin_screen = pygame.image.load('begin_screen.png')
+firstsong = pygame.image.load('pressedagain.png')
 
 current_image = title_screen
 
-running = True
-while running:
+end_game = False
+
+while end_game == False:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            end_game = True
 
-# first state: title screen 
-    line = ser.readline().decode().strip()
-    b1, b2 = map(int, line.split(",")) # convert both inputs to int
-    if b1 == 0 or b2 == 0: # a buzzer was pressed
-        current_image = begin_screen
+    while current_image == title_screen: # first image transition: title screen 
+        line = ser.readline().decode().strip()
+        b1, b2 = map(int, line.split(",")) # convert both inputs to int
 
-    screen.blit(current_image, (0, 0))  # draw image
-    pygame.display.flip()  # update screen
-    clock.tick(60)  # limit FPS
+        if b1 == 0 or b2 == 0: # a buzzer was pressed
+            current_image = begin_screen
+        
+        screen.blit(current_image, (0, 0))  # draw image
+        pygame.display.flip()  # update screen
+        clock.tick(60)  # limit FPS
 
-pygame.quit()
+    while current_image == begin_screen: # second image transition: begin screen
+        line = ser.readline().decode().strip()
+        b1, b2 = map(int, line.split(",")) # convert both inputs to int
+
+        if b1 == 0 or b2 == 0: # a buzzer was pressed
+            current_image = firstsong
+        
+        screen.blit(current_image, (0, 0))  # draw image
+        pygame.display.flip()  # update screen
+        clock.tick(60)  # limit FPS
+
+# pygame.quit()
 
 
 '''
-    if line == 'BUTTON1' or line == 'BUTTON2': # button 1 pressed
-        current_image = img_pressed
-    elif line == 'BUTTON2': # button 1 pressed
-        current_image = img_normal
+# second image transition: begin screen
+    if current_image == begin_screen and (b1 == 0 or b2 == 0):
+        current_image = firstsong
 '''
