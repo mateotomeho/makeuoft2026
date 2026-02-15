@@ -209,14 +209,22 @@ pointPlayer1 = 0
 pointPlayer2 = 0
 score = "00"
 
+b1 = 1
+b2 = 1
 #Buzzed Logic
 def buzzed():
-    return player1
+    line = ser.readline().decode().strip()
 
+    try:
+        b1, b2 = map(int, line.split(",")) # convert both inputs to int
+    except ValueError:
+        return None
 
-#Show Image Logic
-def show_image(image):
-    return  
+    if b1 == 0:
+        return player1
+    elif b2 == 0:
+        return player2
+
 
 #Update the score
 def check_score():
@@ -577,6 +585,7 @@ while end_game == False:
         screen.blit(current_image, (0, 0))  # draw image
         pygame.display.flip()  # update screen
         clock.tick(60)  # limit FPS
+        ser.reset_input_buffer()
 
     while current_image == begin_screen: # second image transition: begin screen
         line = ser.readline().decode().strip()
@@ -590,10 +599,14 @@ while end_game == False:
         clock.tick(60)  # limit FPS
 
     #CHECK TRACK 1
+    pygame.mixer.init()
+    pygame.mixer.music.load(audio_files["track1"])
+    pygame.mixer.music.play()
+    time.sleep(5)
+    ser.reset_input_buffer()
+    time.sleep(1)
+
     while track1_is_done == False:
-        pygame.mixer.init()
-        pygame.mixer.music.load(audio_files["track1"])
-        pygame.mixer.music.play()
         if buzzed() == player1:
             image_buzzed("p1song1")
             if response_audio() == True:
@@ -619,10 +632,14 @@ while end_game == False:
 
     #WAIT FOR TRACK 2 TRANSITION
     #CHECK TRACK 2
+    pygame.mixer.init()
+    pygame.mixer.music.load(audio_files["track2"])
+    pygame.mixer.music.play()
+    time.sleep(5)
+    ser.reset_input_buffer()
+    time.sleep(1)
+
     while track2_is_done == False:
-        pygame.mixer.init()
-        pygame.mixer.music.load(audio_files["track2"])
-        pygame.mixer.music.play()
         if buzzed() == player1:
             image_buzzed("p1song2")
             if response_audio() == True:
@@ -648,10 +665,14 @@ while end_game == False:
 
     #WAIT FOR TRACK 3 TRANSITION
     #CHECK TRACK 3
+    pygame.mixer.init()
+    pygame.mixer.music.load(audio_files["track3"])
+    pygame.mixer.music.play()
+    time.sleep(5)
+    ser.reset_input_buffer()
+    time.sleep(1)
+
     while track3_is_done == False:
-        pygame.mixer.init()
-        pygame.mixer.music.load(audio_files["track3"])
-        pygame.mixer.music.play()
         if buzzed() == player1:
             image_buzzed("p1song3")
             if response_audio() == True:
