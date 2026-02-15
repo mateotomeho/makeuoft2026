@@ -15,6 +15,17 @@ clock = pygame.time.Clock()
 # Scale to monitor resolution
 screen_width, screen_height = screen.get_size()
 
+audio_files = {
+    "track1": "song1_clip.mp3",
+    "track2": "song2_clip.mp3",
+    "track3": "song3_clip.mp3"
+}
+
+good_answers = { # will be lowercase by default
+    "track1": ["will always", "love you", "whitney", "houston", "wit", "whit", "hue"],
+    "track2": ["perfect", "ed", "sheer", "sheeran", "shear"],
+    "track3": ["thousand", "1000", "years", "perri", "christina", "cristina", "perry", "parry", "perrier"]
+}
 # Load images
 title_screen = pygame.image.load('title_screen.png')
 begin_screen = pygame.image.load('begin_screen.png')
@@ -196,9 +207,6 @@ score = "00"
 def buzzed():
     return player1
 
-#Response for Voice Recorder Logic
-def response_audio():
-    return False
 
 #Show Image Logic
 def show_image(image):
@@ -419,6 +427,93 @@ def image_buzzed(image):
             clock.tick(60)  # limit FPS
 
 
+#IMPORTANT
+#User have 3 sec the see who buzzed first & record answer
+#Then 10 sec to play the voice recording of their answer
+
+import os
+import sounddevice as sd
+import soundfile as sf
+from pydub import AudioSegment
+from google import genai
+
+#Response for Voice Recorder Logic
+def response_audio():
+    #Record audio from microphone, save as .mp3, and transcribe with Gemini API
+    SECONDS = 5
+    SAMPLE_RATE = 44100
+    WAV_PATH = "recorded_5s.wav"
+    MP3_PATH = "recorded_5s.mp3"
+
+    MODEL = "models/gemini-3-flash-preview" 
+
+    #Record Audio from Microphone
+    print(f"Recording for {SECONDS} seconds")
+    audio = sd.rec(int(SECONDS * SAMPLE_RATE), samplerate=SAMPLE_RATE, channels=1, dtype="float32")
+    sd.wait()
+    print("Recording done")
+
+    # Save WAV first 
+    sf.write(WAV_PATH, audio, SAMPLE_RATE)
+
+    #Convert .wav to .mp3 using pydub (requires ffmpeg)
+    print("Converting to MP3")
+    try:
+        AudioSegment.from_wav(WAV_PATH).export(MP3_PATH, format="mp3", bitrate="192k")
+    except Exception as e:
+        raise RuntimeError(
+            "MP3 conversion failed. Make sure ffmpeg is installed (brew install ffmpeg on Mac).\n"
+            f"Original error: {e}"
+        )
+
+    print(f"Saved MP3: {MP3_PATH}")
+
+    # #Speech to text recognition with Gemini API
+    # api_key = os.environ.get("GEMINI_API_KEY")
+    # if not api_key:
+    #     raise RuntimeError("Error run: export GEMINI_API_KEY='YOUR_KEY'")
+
+    # client = genai.Client(api_key=api_key)
+
+    # uploaded = client.files.upload(file=MP3_PATH)
+
+    # response = client.models.generate_content(
+    #     model=MODEL,
+    #     contents=[
+    #         "Transcribe this audio exactly. Output only the transcript.",
+    #         uploaded,
+    #     ],
+    # )
+
+    # print("Transcript:")
+    # print(response.text)
+
+    response = response.text.lower().strip() # normalize transcript for comparison
+
+    #To test without Gemini API
+    response = good_answers["track1"] + good_answers["track2"] + good_answers["track3"] # combine all good answers for easier checking
+
+    #Check if the response is correct using answer
+    if track1_is_done == False:
+        for ans in good_answers["track1"]:
+            #Check if the response matches any of the correct answers
+            if ans in response:
+                return True
+        return False
+    
+    elif track2_is_done == False:
+        for ans in good_answers["track2"]:
+            #Check if the response matches any of the correct answers
+            if ans in response:
+                return True
+        return False
+    
+    elif track3_is_done == False:
+        for ans in good_answers["track3"]:
+            #Check if the response matches any of the correct answers
+            if ans in response:
+                return True
+        return False
 # MAIN GAME LOOP
 #Rules:
 #Start the game, show song screen until a buzzer is pressed
@@ -457,6 +552,9 @@ while end_game == False:
 
     #CHECK TRACK 1
     while track1_is_done == False:
+        pygame.mixer.init()
+        pygame.mixer.music.load(audio_files["track1"])
+        pygame.mixer.music.play()
         if buzzed() == player1:
             image_buzzed("p1song1")
             if response_audio() == True:
@@ -483,6 +581,9 @@ while end_game == False:
     #WAIT FOR TRACK 2 TRANSITION
     #CHECK TRACK 2
     while track2_is_done == False:
+        pygame.mixer.init()
+        pygame.mixer.music.load(audio_files["track2"])
+        pygame.mixer.music.play()
         if buzzed() == player1:
             image_buzzed("p1song2")
             if response_audio() == True:
@@ -509,6 +610,9 @@ while end_game == False:
     #WAIT FOR TRACK 3 TRANSITION
     #CHECK TRACK 3
     while track3_is_done == False:
+        pygame.mixer.init()
+        pygame.mixer.music.load(audio_files["track3"])
+        pygame.mixer.music.play()
         if buzzed() == player1:
             image_buzzed("p1song3")
             if response_audio() == True:
@@ -598,3 +702,5 @@ while end_game == False:
 # track3_wait_10 = pygame.image.load('track3_wait_10.png')
 # track3_wait_11 = pygame.image.load('track3_wait_11.png')
 # track3_wait_20 = pygame.image.load('track3_wait_20.png')
+
+
