@@ -25,7 +25,7 @@ audio_files = {
 good_answers = { # will be lowercase by default
     "track1": ["will always", "love you", "whitney", "houston", "wit", "whit", "hue"],
     "track2": ["perfect", "ed", "sheer", "sheeran", "shear"],
-    "track3": ["thousand", "1000", "years", "perri", "christina", "cristina", "perry", "parry", "perrier"]
+    "track3": ["love story", "story", "tailor", "taylor", "swift"]
 }
 # Load images
 
