@@ -251,7 +251,7 @@ def check_score():
         score = "03"
 
 def take_picture():
-    url = "http://100.66.146.90/capture"
+    url = "http://100.66.148.19/capture"
 
     # Download image
     response = requests.get(url, timeout=10)
@@ -314,6 +314,8 @@ def image_buzzed(image):
         screen.blit(current_image, (0, 0))  # draw image
         pygame.display.flip()  # update screen
         clock.tick(60)  # limit FPS 
+        ser.reset_input_buffer()
+        time.sleep(1)
         while current_image == track1_correct_10: 
             line = ser.readline().decode().strip()
             b1, b2 = map(int, line.split(",")) # convert both inputs to int
@@ -335,6 +337,8 @@ def image_buzzed(image):
         screen.blit(current_image, (0, 0))  # draw image
         pygame.display.flip()  # update screen
         clock.tick(60)  # limit FPS 
+        ser.reset_input_buffer()
+        time.sleep(1)
         while current_image == track1_correct_01: 
             line = ser.readline().decode().strip()
             b1, b2 = map(int, line.split(",")) # convert both inputs to int
@@ -356,6 +360,8 @@ def image_buzzed(image):
         screen.blit(current_image, (0, 0))  # draw image
         pygame.display.flip()  # update screen
         clock.tick(60)  # limit FPS 
+        ser.reset_input_buffer()
+        time.sleep(1)
         while current_image == track1_incorrect_00: 
             line = ser.readline().decode().strip()
             b1, b2 = map(int, line.split(",")) # convert both inputs to int
@@ -396,6 +402,8 @@ def image_buzzed(image):
         screen.blit(current_image, (0, 0))  # draw image
         pygame.display.flip()  # update screen
         clock.tick(60)  # limit FPS
+        ser.reset_input_buffer()
+        time.sleep(1)
         while current_image == globals()[f"track2_correct_{score}"]: 
             line = ser.readline().decode().strip()
             b1, b2 = map(int, line.split(",")) # convert both inputs to int
@@ -412,6 +420,8 @@ def image_buzzed(image):
         screen.blit(current_image, (0, 0))  # draw image
         pygame.display.flip()  # update screen
         clock.tick(60)  # limit FPS
+        ser.reset_input_buffer()
+        time.sleep(1)
         while current_image == globals()[f"track2_incorrect_{score}"]: 
             line = ser.readline().decode().strip()
             b1, b2 = map(int, line.split(",")) # convert both inputs to int
@@ -446,6 +456,8 @@ def image_buzzed(image):
         screen.blit(current_image, (0, 0))  # draw image
         pygame.display.flip()  # update screen
         clock.tick(60)  # limit FPS
+        ser.reset_input_buffer()
+        time.sleep(1)
         while current_image == globals()[f"track3_correct_{score}"]: 
             line = ser.readline().decode().strip()
             b1, b2 = map(int, line.split(",")) # convert both inputs to int
@@ -462,6 +474,8 @@ def image_buzzed(image):
         screen.blit(current_image, (0, 0))  # draw image
         pygame.display.flip()  # update screen
         clock.tick(60)  # limit FPS
+        ser.reset_input_buffer()
+        time.sleep(1)
         while current_image == globals()[f"track3_incorrect_{score}"]: 
             line = ser.readline().decode().strip()
             b1, b2 = map(int, line.split(",")) # convert both inputs to int
@@ -493,7 +507,10 @@ def response_audio():
     MP3_PATH = "recorded_5s.mp3"
 
     MODEL = "models/gemini-3-flash-preview" 
+    #MODEL = "models/gemini-2.5-flash-lite"
+    #MODEL = "models/gemini-2.5-flash"
 
+    
     #Record Audio from Microphone
     print(f"Recording for {SECONDS} seconds")
     audio = sd.rec(int(SECONDS * SAMPLE_RATE), samplerate=SAMPLE_RATE, channels=1, dtype="float32")
@@ -516,30 +533,31 @@ def response_audio():
     print(f"Saved MP3: {MP3_PATH}")
 
     #Speech to text recognition with Gemini API
-    # api_key = os.environ.get("GEMINI_API_KEY")
-    # if not api_key:
-    #     raise RuntimeError("Error run: export GEMINI_API_KEY='YOUR_KEY'")
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise RuntimeError("Error run: export GEMINI_API_KEY='YOUR_KEY'")
 
-    # client = genai.Client(api_key=api_key)
+    client = genai.Client(api_key=api_key)
+    #export GEMINI_API_KEY="your_actual_api_key_here"
 
-    # uploaded = client.files.upload(file=MP3_PATH)
+    uploaded = client.files.upload(file=MP3_PATH)
 
-    # response = client.models.generate_content(
-    #     model=MODEL,
-    #     contents=[
-    #         "Transcribe this audio exactly. Output only the transcript.",
-    #         uploaded,
-    #     ],
-    # )
+    response = client.models.generate_content(
+        model=MODEL,
+        contents=[
+            "Transcribe this audio exactly. Output only the transcript.",
+            uploaded,
+        ],
+    )
 
-    # print("Transcript:")
-    # print(response.text)
+    print("Transcript:")
+    print(response.text)
 
-    # response = response.text.lower().strip() # normalize transcript for comparison
+    response = response.text.lower().strip() # normalize transcript for comparison
 
     #To test without Gemini API
-    response = good_answers["track1"] + good_answers["track2"] + good_answers["track3"] # combine all good answers for easier checking
-    time.sleep(6)
+    #response = good_answers["track1"] + good_answers["track2"] + good_answers["track3"] # combine all good answers for easier checking
+    #time.sleep(2)
 
     #Check if the response is correct using answer
     if track1_is_done == False:
@@ -578,8 +596,10 @@ while end_game == False:
                 
     while current_image == title_screen: # first image transition: title screen 
         line = ser.readline().decode().strip()
-        b1, b2 = map(int, line.split(",")) # convert both inputs to int
-
+        try:
+            b1, b2 = map(int, line.split(",")) # convert both inputs to int
+        except ValueError:
+            continue
         if b1 == 0 or b2 == 0: # a buzzer was pressed
             current_image = begin_screen
         
@@ -593,10 +613,11 @@ while end_game == False:
         b1, b2 = map(int, line.split(",")) # convert both inputs to int
 
         if b1 == 0 or b2 == 0: # a buzzer was pressed
-            current_image = track3_wait_02
-            pointPlayer1 = 0
-            pointPlayer2 = 2
-            score = "02"
+            current_image = track1_wait_00
+            #current_image = track3_wait_02
+            # pointPlayer1 = 0
+            # pointPlayer2 = 2
+            # score = "02"
         
         screen.blit(current_image, (0, 0))  # draw image
         pygame.display.flip()  # update screen
@@ -604,69 +625,69 @@ while end_game == False:
 
     
     # #CHECK TRACK 1
-    # pygame.mixer.init()
-    # pygame.mixer.music.load(audio_files["track1"])
-    # pygame.mixer.music.play()
-    # time.sleep(5)
-    # ser.reset_input_buffer()
-    # time.sleep(1)
+    pygame.mixer.init()
+    pygame.mixer.music.load(audio_files["track1"])
+    pygame.mixer.music.play()
+    time.sleep(5)
+    ser.reset_input_buffer()
+    time.sleep(1)
 
-    # while track1_is_done == False:
-    #     if buzzed() == player1:
-    #         image_buzzed("p1song1")
-    #         if response_audio() == True:
-    #             pointPlayer1 += 1
-    #             track1_is_done = True
-    #             check_score()
-    #             image_buzzed("track1_correct_10")
-    #         else:
-    #             track1_is_done = True
-    #             check_score()
-    #             image_buzzed("track1_incorrect_00")
-    #     elif buzzed() == player2:
-    #         image_buzzed("p2song1")
-    #         if response_audio() == True:
-    #             pointPlayer2 += 1
-    #             track1_is_done = True
-    #             check_score()
-    #             image_buzzed("track1_correct_01")
-    #         else:
-    #             track1_is_done = True
-    #             check_score()
-    #             image_buzzed("track1_incorrect_00")
+    while track1_is_done == False:
+        if buzzed() == player1:
+            image_buzzed("p1song1")
+            if response_audio() == True:
+                pointPlayer1 += 1
+                track1_is_done = True
+                check_score()
+                image_buzzed("track1_correct_10")
+            else:
+                track1_is_done = True
+                check_score()
+                image_buzzed("track1_incorrect_00")
+        elif buzzed() == player2:
+            image_buzzed("p2song1")
+            if response_audio() == True:
+                pointPlayer2 += 1
+                track1_is_done = True
+                check_score()
+                image_buzzed("track1_correct_01")
+            else:
+                track1_is_done = True
+                check_score()
+                image_buzzed("track1_incorrect_00")
 
-    # #WAIT FOR TRACK 2 TRANSITION
-    # #CHECK TRACK 2
-    # pygame.mixer.init()
-    # pygame.mixer.music.load(audio_files["track2"])
-    # pygame.mixer.music.play()
-    # time.sleep(5)
-    # ser.reset_input_buffer()
-    # time.sleep(1)
+    #WAIT FOR TRACK 2 TRANSITION
+    #CHECK TRACK 2
+    pygame.mixer.init()
+    pygame.mixer.music.load(audio_files["track2"])
+    pygame.mixer.music.play()
+    time.sleep(5)
+    ser.reset_input_buffer()
+    time.sleep(1)
 
-    # while track2_is_done == False:
-    #     if buzzed() == player1:
-    #         image_buzzed("p1song2")
-    #         if response_audio() == True:
-    #             pointPlayer1 += 1
-    #             track2_is_done = True
-    #             check_score()
-    #             image_buzzed(f"track2_correct_{score}")
-    #         else:
-    #             track2_is_done = True
-    #             check_score()
-    #             image_buzzed(f"track2_incorrect_{score}")
-    #     elif buzzed() == player2:
-    #         image_buzzed("p2song2")
-    #         if response_audio() == True:
-    #             pointPlayer2 += 1
-    #             track2_is_done = True
-    #             check_score()
-    #             image_buzzed(f"track2_correct_{score}")
-    #         else:
-    #             track2_is_done = True
-    #             check_score()
-    #             image_buzzed(f"track2_incorrect_{score}")
+    while track2_is_done == False:
+        if buzzed() == player1:
+            image_buzzed("p1song2")
+            if response_audio() == True:
+                pointPlayer1 += 1
+                track2_is_done = True
+                check_score()
+                image_buzzed(f"track2_correct_{score}")
+            else:
+                track2_is_done = True
+                check_score()
+                image_buzzed(f"track2_incorrect_{score}")
+        elif buzzed() == player2:
+            image_buzzed("p2song2")
+            if response_audio() == True:
+                pointPlayer2 += 1
+                track2_is_done = True
+                check_score()
+                image_buzzed(f"track2_correct_{score}")
+            else:
+                track2_is_done = True
+                check_score()
+                image_buzzed(f"track2_incorrect_{score}")
 
     #WAIT FOR TRACK 3 TRANSITION
     #CHECK TRACK 3
@@ -721,4 +742,3 @@ pygame.quit()
 
 #Take the picture at the end of the game for fun & memories
 take_picture()
-

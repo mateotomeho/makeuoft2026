@@ -34,7 +34,18 @@ SAMPLE_RATE = 44100
 WAV_PATH = "recorded_5s.wav"
 MP3_PATH = "recorded_5s.mp3"
 
-MODEL = "models/gemini-3-flash-preview" 
+#MODEL = "models/gemini-3-flash-preview" 
+#MODEL = "models/gemini-2.5-flash"
+#MODEL = "models/gemini-2.5-flash-lite"
+
+
+#CAN'T USE:
+#MODEL = "models/gemini-2.0-flash"
+#MODEL = "models/gemini-2.5-flash-native-audio-preview-12-2025"
+#MODEL = "models/gemini-2.0-flash-lite"
+#MODEL = "models/gemini-2.5-pro"
+#MODEL = "models/gemini-2.0-flash-001"
+#MODEL = "models/gemini-3-pro-preview"
 
 #Record Audio from Microphone
 print(f"Recording for {SECONDS} seconds")

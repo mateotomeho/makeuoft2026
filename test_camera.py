@@ -1,7 +1,7 @@
 import requests
 import pygame
 
-url = "http://100.66.146.90/capture"
+url = "http://100.66.148.19/capture"
 
 # Download image
 response = requests.get(url, timeout=10)
