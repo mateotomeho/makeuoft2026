@@ -1,6 +1,7 @@
 import serial
 import time
 import pygame
+import requests
 
 #ser = serial.Serial('COM3', 9600)
 ser = serial.Serial('/dev/cu.usbmodem1301', 9600) # for mac
@@ -235,6 +236,39 @@ def check_score():
         score = "30"
     elif pointPlayer1 == 0 and pointPlayer2 == 3:
         score = "03"
+
+def take_picture():
+    url = "http://100.66.146.90/capture"
+
+    # Download image
+    response = requests.get(url, timeout=10)
+    with open("esp32_image.jpg", "wb") as f:
+        f.write(response.content)
+
+    print("Image saved as esp32_image.jpg")
+
+    # Show fullscreen
+    pygame.init()
+    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    clock = pygame.time.Clock()
+
+    img = pygame.image.load("esp32_image.jpg")
+    img = pygame.transform.scale(img, screen.get_size())
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or (
+                event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
+            ):
+                running = False
+
+        screen.blit(img, (0, 0))
+        pygame.display.flip()
+        clock.tick(60)
+
+    pygame.quit()
+
 
 
 def image_buzzed(image):
@@ -638,6 +672,15 @@ while end_game == False:
 
     time.sleep(10) # wait for 5 seconds on end screen before quitting
     end_game = True
+
+#Take a picture of the players at the end of the game
+current_image = smile_screen
+while current_image == smile_screen: 
+        screen.blit(current_image, (0, 0))  # draw image
+        pygame.display.flip()  # update screen
+        clock.tick(60)  # limit FPS
+        time.sleep(2)
+take_picture()
 
 # pygame.quit()
 
