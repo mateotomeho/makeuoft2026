@@ -28,6 +28,9 @@ good_answers = { # will be lowercase by default
     "track3": ["thousand", "1000", "years", "perri", "christina", "cristina", "perry", "parry", "perrier"]
 }
 # Load images
+
+smile_screen = pygame.image.load('camera_intro.png')
+smile_screen = pygame.transform.scale(smile_screen, (screen_width, screen_height))
 title_screen = pygame.image.load('title_screen.png')
 begin_screen = pygame.image.load('begin_screen.png')
 track1_wait_00 = pygame.image.load('track1_wait_00.png')
@@ -172,6 +175,8 @@ end_12 = pygame.transform.scale(end_12, (screen_width, screen_height))
 end_20 = pygame.transform.scale(end_20, (screen_width, screen_height))
 end_21 = pygame.transform.scale(end_21, (screen_width, screen_height))
 end_30 = pygame.transform.scale(end_30, (screen_width, screen_height))
+
+
 
 current_image = None 
 current_image = title_screen
@@ -522,7 +527,7 @@ def response_audio():
     # print("Transcript:")
     # print(response.text)
 
-    response = response.text.lower().strip() # normalize transcript for comparison
+    #response = response.text.lower().strip() # normalize transcript for comparison
 
     #To test without Gemini API
     response = good_answers["track1"] + good_answers["track2"] + good_answers["track3"] # combine all good answers for easier checking
@@ -673,77 +678,21 @@ while end_game == False:
     time.sleep(10) # wait for 5 seconds on end screen before quitting
     end_game = True
 
-#Take a picture of the players at the end of the game
-current_image = smile_screen
-while current_image == smile_screen: 
-        screen.blit(current_image, (0, 0))  # draw image
-        pygame.display.flip()  # update screen
-        clock.tick(60)  # limit FPS
-        time.sleep(2)
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT or (
+            event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
+        ):
+            running = False
+
+    current_image = smile_screen
+    screen.blit(current_image, (0, 0))  # draw image
+    pygame.display.flip()  # update screen
+    clock.tick(60)  # limit FPS
+
+pygame.quit()
+
+#Take the picture at the end of the game for fun & memories
 take_picture()
-
-# pygame.quit()
-
-
-# while end_game == False:
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             end_game = True
-
-#     while current_image == title_screen: # first image transition: title screen 
-#         line = ser.readline().decode().strip()
-#         b1, b2 = map(int, line.split(",")) # convert both inputs to int
-
-#         if b1 == 0 or b2 == 0: # a buzzer was pressed
-#             current_image = begin_screen
-        
-#         screen.blit(current_image, (0, 0))  # draw image
-#         pygame.display.flip()  # update screen
-#         clock.tick(60)  # limit FPS
-
-#     while current_image == begin_screen: # second image transition: begin screen
-#         line = ser.readline().decode().strip()
-#         b1, b2 = map(int, line.split(",")) # convert both inputs to int
-
-#         if b1 == 0 or b2 == 0: # a buzzer was pressed
-#             current_image = track_wait_00
-        
-#         screen.blit(current_image, (0, 0))  # draw image
-#         pygame.display.flip()  # update screen
-#         clock.tick(60)  # limit FPS
-
-# pygame.quit()
-
-
-# track2_wait_00 = pygame.image.load('track2_wait_00.png')
-# track2_wait_10 = pygame.image.load('track2_wait_10.png')
-# track2_wait_01 = pygame.image.load('track2_wait_01.png')
-
-
-# track2_b1press_00 = pygame.image.load('track2_b1press_00.png')
-# track2_b1press_01 = pygame.image.load('track2_b1press_01.png')
-# track2_b1press_10 = pygame.image.load('track2_b1press_10.png')
-# track2_b2press_00 = pygame.image.load('track2_b2press_00.png')
-# track2_b2press_01 = pygame.image.load('track2_b2press_01.png')
-# track2_b2press_10 = pygame.image.load('track2_b2press_10.png')
-
-
-# track2_correct_01 = pygame.image.load('track2_correct_01.png')
-# track2_correct_10 = pygame.image.load('track2_correct_10.png')
-# track2_correct_11 = pygame.image.load('track2_correct_11.png')
-# track2_correct_20 = pygame.image.load('track2_correct_20.png')
-# track2_correct_02 = pygame.image.load('track2_correct_02.png')
-
-# track2_incorrect_00 = pygame.image.load('track2_incorrect_00.png')
-# track2_incorrect_01 = pygame.image.load('track2_incorrect_01.png')
-# track2_incorrect_10 = pygame.image.load('track2_incorrect_10.png')
-
-
-# track3_wait_00 = pygame.image.load('track3_wait_00.png')
-# track3_wait_01 = pygame.image.load('track3_wait_01.png')
-# track3_wait_02 = pygame.image.load('track3_wait_02.png')
-# track3_wait_10 = pygame.image.load('track3_wait_10.png')
-# track3_wait_11 = pygame.image.load('track3_wait_11.png')
-# track3_wait_20 = pygame.image.load('track3_wait_20.png')
-
 
